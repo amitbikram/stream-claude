@@ -1,0 +1,78 @@
+<!--
+  Externalized assets — swap `https://cdn.example.com/stream-claude/v1` with your CDN base.
+  Source files live in artifacts/assets/.
+-->
+<link rel="stylesheet" href="https://cdn.example.com/stream-claude/v1/seo-pipeline.css" />
+
+<h2 class="sr-only">SEO page creation pipeline — four-step stepper: brief intake, brief generation, content generation, page generation</h2>
+
+<div class="pp" id="pp-root">
+
+  <div class="pp-header">
+    <h1>Create an SEO page</h1>
+    <p>Follow the steps below to generate a fully built page — from brief to live draft.</p>
+  </div>
+
+  <div class="pp-steps" id="pp-steps">
+
+    <div class="pp-step" id="step-row-0">
+      <div class="pp-step-left">
+        <div class="pp-step-node active" id="step-node-0">1</div>
+        <div class="pp-step-line" id="step-line-0"></div>
+      </div>
+      <div class="pp-step-right">
+        <p class="pp-step-title">Brief intake</p>
+        <p class="pp-step-sub active" id="step-sub-0">Fill in keyword, audience, tone, and context</p>
+        <div id="step-summary-0" style="display:none;"></div>
+      </div>
+    </div>
+
+    <div class="pp-step" id="step-row-1">
+      <div class="pp-step-left">
+        <div class="pp-step-node" id="step-node-1">2</div>
+        <div class="pp-step-line" id="step-line-1"></div>
+      </div>
+      <div class="pp-step-right">
+        <p class="pp-step-title">Brief generation</p>
+        <p class="pp-step-sub" id="step-sub-1">Claude generates H1, meta, messaging, FAQs</p>
+        <div id="step-summary-1" style="display:none;"></div>
+      </div>
+    </div>
+
+    <div class="pp-step" id="step-row-2">
+      <div class="pp-step-left">
+        <div class="pp-step-node" id="step-node-2">3</div>
+        <div class="pp-step-line" id="step-line-2"></div>
+      </div>
+      <div class="pp-step-right">
+        <p class="pp-step-title">Content generation</p>
+        <p class="pp-step-sub" id="step-sub-2">Review and edit the generated brief</p>
+        <div id="step-summary-2" style="display:none;"></div>
+      </div>
+    </div>
+
+    <div class="pp-step" id="step-row-3">
+      <div class="pp-step-left">
+        <div class="pp-step-node" id="step-node-3">4</div>
+        <div class="pp-step-line" id="step-line-3"></div>
+      </div>
+      <div class="pp-step-right">
+        <p class="pp-step-title">Page generation</p>
+        <p class="pp-step-sub" id="step-sub-3">Page created in AEM DA, source preview and editor</p>
+        <div id="step-summary-3" style="display:none;"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="pp-cta" id="pp-cta-bar">
+    <button class="pp-btn pp-btn-primary" onclick="startStep(0)">
+      <i class="ti ti-arrow-right" aria-hidden="true"></i> Start with brief intake
+    </button>
+  </div>
+
+  <div id="pp-active-panel"></div>
+
+</div>
+
+<script src="https://cdn.example.com/stream-claude/v1/seo-pipeline.js"></script>

@@ -1,0 +1,91 @@
+<!--
+  Externalized assets — swap `https://cdn.example.com/stream-claude/v1` with your CDN base.
+  Source files live in artifacts/assets/.
+-->
+<link rel="stylesheet" href="https://cdn.example.com/stream-claude/v1/brief-form.css" />
+
+<h2 class="sr-only">Content brief generator form — submits to Claude via Stream-MCP</h2>
+
+<div class="bg-wrap">
+  <div class="bg-masthead">
+    <div class="bg-badge"><i class="ti ti-bolt" style="font-size:11px;" aria-hidden="true"></i> Stream-MCP</div>
+    <p class="bg-title">Generate a content brief</p>
+    <p class="bg-sub">Fill in the details and Claude will call Stream-MCP to generate your brief in the chat.</p>
+  </div>
+
+  <div class="bg-card bg-card-red">
+    <div class="bg-section-label"><span class="bg-dot bg-dot-red"></span> Primary keyword</div>
+    <div class="bg-field">
+      <label class="bg-label" for="bg-kw">Keyword <span class="bg-req">required</span></label>
+      <input type="text" id="bg-kw" placeholder="e.g. AI sticker generator" autocomplete="off" />
+      <div class="bg-chips">
+        <button class="bg-chip" data-kw="AI logo generator">AI logo generator</button>
+        <button class="bg-chip" data-kw="AI video editor">AI video editor</button>
+        <button class="bg-chip" data-kw="background remover">background remover</button>
+        <button class="bg-chip" data-kw="AI headshot generator">AI headshot generator</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-card bg-card-amber">
+    <div class="bg-section-label"><span class="bg-dot bg-dot-amber"></span> Targeting</div>
+    <div class="bg-row">
+      <div class="bg-field">
+        <label class="bg-label" for="bg-audience">Audience <span class="bg-opt">optional</span></label>
+        <input type="text" id="bg-audience" placeholder="e.g. small business owners" />
+      </div>
+      <div class="bg-field">
+        <label class="bg-label" for="bg-tone">Tone <span class="bg-opt">optional</span></label>
+        <select id="bg-tone">
+          <option value="">Default</option>
+          <option value="friendly and approachable">Friendly &amp; approachable</option>
+          <option value="professional and authoritative">Professional &amp; authoritative</option>
+          <option value="playful and energetic">Playful &amp; energetic</option>
+          <option value="technical and precise">Technical &amp; precise</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-card bg-card-green">
+    <div class="bg-section-label"><span class="bg-dot bg-dot-green"></span> Extra context</div>
+    <div class="bg-field">
+      <label class="bg-label" for="bg-context">Notes <span class="bg-opt">angles, must-mentions, products, etc.</span></label>
+      <textarea id="bg-context" rows="3" placeholder="e.g. position around Adobe Firefly; mention commercial-safe model; emphasize photo-to-sticker mode"></textarea>
+    </div>
+  </div>
+
+  <div class="bg-card bg-card-blue">
+    <div class="bg-section-label"><span class="bg-dot bg-dot-blue"></span> After the brief</div>
+    <div class="bg-next-opts">
+      <label class="bg-next-opt sel">
+        <input type="radio" name="bg-next" value="brief-only" checked />
+        <div>
+          <div class="bg-opt-title">Brief only</div>
+          <div class="bg-opt-desc">Stop after the brief — review before doing anything else</div>
+        </div>
+      </label>
+      <label class="bg-next-opt">
+        <input type="radio" name="bg-next" value="brief-page" />
+        <div>
+          <div class="bg-opt-title">Brief → create page</div>
+          <div class="bg-opt-desc">Generate brief, then call <code>create_page_from_brief</code></div>
+        </div>
+      </label>
+      <label class="bg-next-opt">
+        <input type="radio" name="bg-next" value="brief-page-preflight" />
+        <div>
+          <div class="bg-opt-title">Brief → page → preflight</div>
+          <div class="bg-opt-desc">Full pipeline: brief, page, then <code>generate_preflight_report</code></div>
+        </div>
+      </label>
+    </div>
+  </div>
+
+  <div class="bg-footer">
+    <div class="bg-status" id="bg-status"><i class="ti ti-point-filled"></i> Ready</div>
+    <button class="bg-btn" id="bg-submit"><i class="ti ti-send" aria-hidden="true"></i> Generate brief ↗</button>
+  </div>
+</div>
+
+<script src="https://cdn.example.com/stream-claude/v1/brief-form.js"></script>

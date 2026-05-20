@@ -1,0 +1,77 @@
+<!--
+  Externalized assets — swap `https://cdn.example.com/stream-claude/v1` with your CDN base.
+  Source files live in artifacts/assets/.
+-->
+<link rel="stylesheet" href="https://cdn.example.com/stream-claude/v1/brief-viewer.css" />
+
+<h2 class="sr-only">Content brief viewer — review, edit, add or remove FAQs, then regenerate or proceed to create the page</h2>
+
+<div class="bv" id="bv-root">
+
+  <div class="bv-hero">
+    <div class="bv-hero-left">
+      <div class="bv-hero-kicker">
+        <span class="bv-status-dot"></span>
+        <span class="bv-kicker-text">Brief ready</span>
+      </div>
+      <input class="bv-h1" id="bv-h1" value="Create unique logos with Adobe Firefly AI Logo Generator" readonly />
+      <textarea class="bv-meta-text" id="bv-meta" rows="2" readonly>Design custom logos fast and easily with Adobe Firefly AI Logo Generator. Generate commercially safe logos that fit your brand perfectly.</textarea>
+    </div>
+    <div class="bv-hero-right">
+      <button class="bv-edit-btn" id="bv-toggle" onclick="toggleEdit()">
+        <i class="ti ti-edit" aria-hidden="true"></i> Edit
+      </button>
+      <span class="bv-edit-hint" id="bv-hint">click to edit</span>
+    </div>
+  </div>
+
+  <div class="bv-grid">
+
+    <div class="bv-section bv-sec-purple">
+      <div class="bv-sec-label bv-lbl-purple"><i class="ti ti-target" aria-hidden="true"></i> Core messaging</div>
+      <textarea class="bv-prose" id="bv-messaging" rows="5" readonly>Focus on how the AI logo generator helps users create unique, professional logos quickly — no design experience needed. Lead with the idea that it guides creativity by turning ideas into polished visuals, saving time and effort. Emphasize customization, creative control, and commercial safety. The tool should feel accessible: ideal for entrepreneurs, small businesses, and creatives.</textarea>
+    </div>
+
+    <div class="bv-section bv-sec-amber">
+      <div class="bv-sec-label bv-lbl-amber"><i class="ti ti-photo" aria-hidden="true"></i> Visual tone</div>
+      <textarea class="bv-prose" id="bv-visual" rows="5" readonly>Bright, colorful, fresh, and inspiring. Show polished logo examples on vibrant backgrounds — optimistic and approachable. Avoid dark or moody imagery. Clean layouts that keep focus on the logo designs and customization options.</textarea>
+    </div>
+
+    <div class="bv-section bv-section-full bv-sec-blue">
+      <div class="bv-sec-label bv-lbl-blue"><i class="ti ti-help-circle" aria-hidden="true"></i> FAQ topics</div>
+      <div class="bv-faq-list" id="bv-faq-list">
+        <div class="bv-faq-item">
+          <span class="bv-faq-num">1</span>
+          <input class="bv-faq-text" value="How do I customize logos with Adobe Firefly AI Logo Generator?" readonly />
+          <button class="bv-faq-del" onclick="delFaq(this)" aria-label="Remove FAQ"><i class="ti ti-x"></i></button>
+        </div>
+        <div class="bv-faq-item">
+          <span class="bv-faq-num">2</span>
+          <input class="bv-faq-text" value="Can I use logos created with Adobe Firefly commercially?" readonly />
+          <button class="bv-faq-del" onclick="delFaq(this)" aria-label="Remove FAQ"><i class="ti ti-x"></i></button>
+        </div>
+        <div class="bv-faq-item">
+          <span class="bv-faq-num">3</span>
+          <input class="bv-faq-text" value="What file formats can I export from the AI logo generator?" readonly />
+          <button class="bv-faq-del" onclick="delFaq(this)" aria-label="Remove FAQ"><i class="ti ti-x"></i></button>
+        </div>
+      </div>
+      <div class="bv-add-faq" id="bv-add-row">
+        <input class="bv-add-input" id="bv-new-faq" placeholder="Add a new FAQ topic…" />
+        <button class="bv-add-btn" onclick="addFaq()"><i class="ti ti-plus" aria-hidden="true"></i> Add</button>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="bv-footer">
+    <span class="bv-footer-label">Next step</span>
+    <button class="bv-btn" onclick="doRegenerate()"><i class="ti ti-refresh" aria-hidden="true"></i> Regenerate ↗</button>
+    <button class="bv-btn" onclick="doTweak()"><i class="ti ti-message" aria-hidden="true"></i> Request changes ↗</button>
+    <div class="bv-spacer"></div>
+    <button class="bv-btn bv-btn-proceed" onclick="doProceed()"><i class="ti ti-arrow-right" aria-hidden="true"></i> Create page ↗</button>
+  </div>
+
+</div>
+
+<script src="https://cdn.example.com/stream-claude/v1/brief-viewer.js"></script>

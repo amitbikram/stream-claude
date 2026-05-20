@@ -1,0 +1,143 @@
+<!--
+  Externalized assets — swap `https://cdn.example.com/stream-claude/v1` with your CDN base.
+  Source files live in artifacts/assets/.
+-->
+<link rel="stylesheet" href="https://cdn.example.com/stream-claude/v1/da-editor.css" />
+
+<h2 class="sr-only">AEM DA page viewer and editor — preview, edit fields or raw source, push updates via da_create_source</h2>
+
+<div class="da">
+
+  <div class="da-topbar">
+    <div class="da-topbar-left">
+      <div class="da-badge"><i class="ti ti-brand-adobe" aria-hidden="true" style="font-size:12px;"></i> AEM DA Prod</div>
+      <span class="da-url" id="da-url">da.live/editor/…/ai-logo-generator</span>
+    </div>
+    <div class="da-topbar-right">
+      <button class="da-btn" onclick="doRefresh()"><i class="ti ti-refresh" aria-hidden="true"></i> Refresh</button>
+      <button class="da-btn" onclick="doOpenDA()"><i class="ti ti-external-link" aria-hidden="true"></i> Open in DA</button>
+      <button class="da-btn" onclick="doPreflight()"><i class="ti ti-clipboard-check" aria-hidden="true"></i> Preflight ↗</button>
+    </div>
+  </div>
+
+  <div class="da-mode-bar">
+    <button class="da-mode-btn active" id="btn-preview" onclick="setMode('preview')">Preview</button>
+    <button class="da-mode-btn" id="btn-edit" onclick="setMode('edit')">Edit fields</button>
+    <button class="da-mode-btn" id="btn-source" onclick="setMode('source')">Raw source</button>
+    <div class="da-mode-sep"></div>
+    <span class="da-dirty" id="da-dirty">Unsaved changes</span>
+  </div>
+
+  <div id="mode-preview">
+
+    <div class="da-card da-c-blue">
+      <div class="da-card-label da-lbl-blue"><i class="ti ti-file-description" aria-hidden="true"></i> Page</div>
+      <div class="da-h1" id="pv-h1">Create unique logos with Adobe Firefly AI Logo Generator</div>
+      <div class="da-desc" id="pv-meta">Design custom logos fast and easily with Adobe Firefly AI Logo Generator. Generate commercially safe logos that fit your brand perfectly.</div>
+      <div class="da-pills">
+        <span class="da-pill"><i class="ti ti-layout" aria-hidden="true"></i> Feature page</span>
+        <span class="da-pill"><i class="ti ti-photo" aria-hidden="true"></i> 4 images</span>
+        <span class="da-pill"><i class="ti ti-stack" aria-hidden="true"></i> 5 blocks</span>
+      </div>
+    </div>
+
+    <div class="da-card da-c-purple">
+      <div class="da-card-label da-lbl-purple"><i class="ti ti-target" aria-hidden="true"></i> Hero copy</div>
+      <div class="da-prose" id="pv-hero">Make stunning logos in minutes — no designer required. Adobe Firefly AI Logo Generator turns your ideas into polished, commercially safe logos. Customize colors, styles, and layouts to perfectly match your brand.</div>
+    </div>
+
+    <div class="da-card da-c-teal">
+      <div class="da-card-label da-lbl-teal"><i class="ti ti-list-check" aria-hidden="true"></i> Feature highlights</div>
+      <div class="da-prose" id="pv-features">Commercial-safe by design — every logo is ready to use in any project. Full creative control with real-time customization. Built for entrepreneurs, small businesses, and creatives.</div>
+    </div>
+
+    <div class="da-card da-c-amber">
+      <div class="da-card-label da-lbl-amber"><i class="ti ti-help-circle" aria-hidden="true"></i> FAQ topics</div>
+      <div class="da-faq-list" id="pv-faqs">
+        <div class="da-faq-row"><span class="da-faq-num">1</span><span class="da-faq-view">How do I customize logos with Adobe Firefly AI Logo Generator?</span></div>
+        <div class="da-faq-row"><span class="da-faq-num">2</span><span class="da-faq-view">Can I use logos created with Adobe Firefly commercially?</span></div>
+        <div class="da-faq-row"><span class="da-faq-num">3</span><span class="da-faq-view">What file formats can I export from the AI logo generator?</span></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div id="mode-edit" style="display:none;">
+
+    <div class="da-card da-c-blue">
+      <div class="da-card-label da-lbl-blue"><i class="ti ti-file-description" aria-hidden="true"></i> Page H1</div>
+      <input class="da-edit-inp" id="ed-h1" value="Create unique logos with Adobe Firefly AI Logo Generator" oninput="markDirty()" />
+    </div>
+
+    <div class="da-card da-c-purple">
+      <div class="da-card-label da-lbl-purple"><i class="ti ti-search" aria-hidden="true"></i> Meta description</div>
+      <textarea class="da-edit-inp da-edit-ta" id="ed-meta" rows="2" oninput="markDirty()">Design custom logos fast and easily with Adobe Firefly AI Logo Generator. Generate commercially safe logos that fit your brand perfectly.</textarea>
+    </div>
+
+    <div class="da-card da-c-teal">
+      <div class="da-card-label da-lbl-teal"><i class="ti ti-target" aria-hidden="true"></i> Hero copy</div>
+      <textarea class="da-edit-inp da-edit-ta" id="ed-hero" rows="3" oninput="markDirty()">Make stunning logos in minutes — no designer required. Adobe Firefly AI Logo Generator turns your ideas into polished, commercially safe logos. Customize colors, styles, and layouts to perfectly match your brand.</textarea>
+    </div>
+
+    <div class="da-card da-c-coral">
+      <div class="da-card-label da-lbl-coral"><i class="ti ti-list-check" aria-hidden="true"></i> Feature highlights</div>
+      <textarea class="da-edit-inp da-edit-ta" id="ed-features" rows="3" oninput="markDirty()">Commercial-safe by design — every logo is ready to use in any project. Full creative control with real-time customization. Built for entrepreneurs, small businesses, and creatives.</textarea>
+    </div>
+
+    <div class="da-card da-c-amber">
+      <div class="da-card-label da-lbl-amber"><i class="ti ti-help-circle" aria-hidden="true"></i> FAQ topics</div>
+      <div class="da-faq-list" id="ed-faqs">
+        <div class="da-faq-row"><span class="da-faq-num">1</span><input class="da-faq-inp" value="How do I customize logos with Adobe Firefly AI Logo Generator?" oninput="markDirty()" /><button class="da-faq-del" onclick="delFaq(this)" aria-label="Remove FAQ"><i class="ti ti-x"></i></button></div>
+        <div class="da-faq-row"><span class="da-faq-num">2</span><input class="da-faq-inp" value="Can I use logos created with Adobe Firefly commercially?" oninput="markDirty()" /><button class="da-faq-del" onclick="delFaq(this)" aria-label="Remove FAQ"><i class="ti ti-x"></i></button></div>
+        <div class="da-faq-row"><span class="da-faq-num">3</span><input class="da-faq-inp" value="What file formats can I export from the AI logo generator?" oninput="markDirty()" /><button class="da-faq-del" onclick="delFaq(this)" aria-label="Remove FAQ"><i class="ti ti-x"></i></button></div>
+      </div>
+      <div class="da-add-row">
+        <input class="da-add-inp" id="ed-new-faq" placeholder="New FAQ topic — press Enter to add" />
+        <button class="da-add-btn" onclick="addFaq()"><i class="ti ti-plus" aria-hidden="true"></i> Add</button>
+      </div>
+    </div>
+
+  </div>
+
+  <div id="mode-source" style="display:none;">
+    <div class="da-card da-c-blue">
+      <div class="da-card-label da-lbl-blue"><i class="ti ti-code" aria-hidden="true"></i> Raw markdown source</div>
+      <div class="da-raw-wrap">
+        <textarea class="da-raw-ta" id="da-raw" oninput="markDirty()"># Create unique logos with Adobe Firefly AI Logo Generator
+
+Design custom logos fast and easily with Adobe Firefly AI Logo Generator. Generate commercially safe logos that fit your brand perfectly.
+
+## Hero
+| Hero |
+| --- |
+| Make stunning logos in minutes — no designer required. Adobe Firefly AI Logo Generator turns your ideas into polished, commercially safe logos. |
+
+## Features
+| Features |
+| --- |
+| Commercial-safe by design — every logo is ready to use in any project. |
+| Full creative control with real-time customization. |
+| Built for entrepreneurs, small businesses, and creatives. |
+
+## FAQ
+| FAQ |
+| --- |
+| How do I customize logos with Adobe Firefly AI Logo Generator? |
+| Can I use logos created with Adobe Firefly commercially? |
+| What file formats can I export from the AI logo generator? |</textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="da-footer">
+    <div class="da-footer-info"><i class="ti ti-clock" aria-hidden="true"></i><span id="da-time">Fetched just now</span></div>
+    <div class="da-spacer"></div>
+    <span class="da-push-status" id="da-push-st"></span>
+    <button class="da-btn da-btn-push" id="da-push-btn" onclick="doPush()" disabled>
+      <i class="ti ti-upload" aria-hidden="true"></i> Push to DA ↗
+    </button>
+  </div>
+
+</div>
+
+<script src="https://cdn.example.com/stream-claude/v1/da-editor.js"></script>
