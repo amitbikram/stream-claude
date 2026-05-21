@@ -34,7 +34,8 @@
   // ----- SVG icons -----
   const SVG_CHEVRON_LEFT = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   const SVG_OPEN = '<svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M7 1h4v4M11 1L5.5 6.5M5 2H2a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1V8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-  const SVG_BAN = '<svg width="14" height="14" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M9 1C4.58172 1 1 4.58172 1 9C1 13.4183 4.58172 17 9 17C13.4183 17 17 13.4183 17 9C17 4.58172 13.4183 1 9 1ZM15 9C15.0019 10.2463 14.6141 11.462 13.891 12.477L5.523 4.11C8.22358 2.18971 11.9695 2.82225 13.8898 5.52283C14.612 6.53847 15 7.75377 15 9ZM3 9C2.998 7.75401 3.38577 6.53861 4.109 5.524L12.477 13.891C9.77642 15.8113 6.03046 15.1788 4.11017 12.4782C3.38779 11.4623 2.99976 10.2466 3 9Z" fill="currentColor"/></svg>';
+  // Feather "ban"/"slash" icon — stroke-based so it renders reliably at small sizes
+  const SVG_BAN = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><line x1="5.6" y1="5.6" x2="18.4" y2="18.4"/></svg>';
   const SVG_UPLOAD = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 16V8M12 8L9 11M12 8L15 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 20H17C18.1 20 19 19.1 19 18V14M5 14V18C5 19.1 5.9 20 7 20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   const SVG_EXT = '<svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M18 15.75V12.0308C18 11.6167 17.6641 11.2808 17.25 11.2808C16.8359 11.2808 16.5 11.6167 16.5 12.0308V15.75C16.5 16.1636 16.1636 16.5 15.75 16.5H4.25C3.83643 16.5 3.5 16.1636 3.5 15.75V4.25C3.5 3.83643 3.83643 3.5 4.25 3.5H8.06104C8.4751 3.5 8.81104 3.16406 8.81104 2.75C8.81104 2.33594 8.4751 2 8.06104 2H4.25C3.00928 2 2 3.00928 2 4.25V15.75C2 16.9907 3.00928 18 4.25 18H15.75C16.9907 18 18 16.9907 18 15.75Z" fill="currentColor"/><path d="M19 1.75V5.99268C19 6.40674 18.6641 6.74268 18.25 6.74268C17.8359 6.74268 17.5 6.40674 17.5 5.99268V3.56055L11.0303 10.0303C10.8838 10.1768 10.6919 10.25 10.5 10.25C10.3081 10.25 10.1162 10.1768 9.96973 10.0303C9.67676 9.73731 9.67676 9.2627 9.96973 8.96973L16.4395 2.5H14.0073C13.5933 2.5 13.2573 2.16406 13.2573 1.75C13.2573 1.33594 13.5933 1 14.0073 1H18.25C18.6641 1 19 1.33594 19 1.75Z" fill="currentColor"/></svg>';
   const SVG_SUCCESS = '<svg class="page-gen__success-svg" width="40" height="40" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 18.75C5.17529 18.75 1.25 14.8252 1.25 10C1.25 5.1748 5.17529 1.25 10 1.25C14.8247 1.25 18.75 5.1748 18.75 10C18.75 14.8252 14.8247 18.75 10 18.75ZM10 2.75C6.00244 2.75 2.75 6.00195 2.75 10C2.75 13.998 6.00244 17.25 10 17.25C13.9976 17.25 17.25 13.998 17.25 10C17.25 6.00195 13.9976 2.75 10 2.75Z" fill="#079355"/><path class="page-gen__svg-check" d="M9.18263 13.9434C8.97072 13.9434 8.76759 13.8535 8.62501 13.6953L5.98146 10.7559C5.7046 10.4473 5.72951 9.97363 6.03761 9.69629C6.34571 9.41895 6.82032 9.44531 7.09669 9.75195L9.12355 12.0059L12.8228 6.95996C13.0674 6.62598 13.5381 6.55273 13.8711 6.79883C14.2051 7.04297 14.2774 7.5127 14.0327 7.84668L9.78761 13.6367C9.65382 13.8193 9.44532 13.9316 9.22023 13.9424C9.20753 13.9434 9.19484 13.9434 9.18263 13.9434Z" fill="#079355"/></svg>';
@@ -192,24 +193,30 @@
     return enabled.concat(custom);
   }
 
+  function skillRowHtml(s, disabled) {
+    const isCustom = !!s.isCustom;
+    return (
+      `<li class="wizard-skills-list__item${disabled ? ' wizard-skills-list__item--disabled' : ''}" data-skill-name="${escAttr(s.name)}">` +
+        `<div class="wizard-skills-list__row">` +
+          `<a href="${escAttr(s.url || '#')}" target="_blank" rel="noreferrer" class="wizard-skills-list__name-link">${escText(s.name)}</a>` +
+          (isCustom ? `<span class="wizard-skills-list__custom-badge">custom</span>` : '') +
+          `<div class="wizard-skills-list__actions">` +
+            (s.url ? `<a href="${escAttr(s.url)}" target="_blank" rel="noreferrer" class="wizard-skills-list__action-btn" aria-label="Open ${escAttr(s.name)}">${SVG_OPEN}</a>` : '') +
+            `<button type="button" class="wizard-skills-list__action-btn wizard-skills-list__action-btn--disable" aria-label="${disabled ? 'Enable' : 'Disable'} ${escAttr(s.name)}" aria-pressed="${disabled}" onclick="bwToggleSkill('${escAttr(s.name)}')">${SVG_BAN}</button>` +
+          `</div>` +
+        `</div>` +
+      `</li>`
+    );
+  }
+
+  function updateActiveBadge() {
+    const badge = document.getElementById('bw-active-badge');
+    if (badge) badge.textContent = activeSkillsList().length + ' active';
+  }
+
   function renderSkills() {
     const allRows = SKILLS.concat(state.skills.custom);
-    const rows = allRows.map(s => {
-      const disabled = state.skills.disabled.has(s.name);
-      const isCustom = !!s.isCustom;
-      return (
-        `<li class="wizard-skills-list__item${disabled ? ' wizard-skills-list__item--disabled' : ''}">` +
-          `<div class="wizard-skills-list__row">` +
-            `<a href="${escAttr(s.url || '#')}" target="_blank" rel="noreferrer" class="wizard-skills-list__name-link">${escText(s.name)}</a>` +
-            (isCustom ? `<span class="wizard-skills-list__custom-badge">custom</span>` : '') +
-            `<div class="wizard-skills-list__actions">` +
-              (s.url ? `<a href="${escAttr(s.url)}" target="_blank" rel="noreferrer" class="wizard-skills-list__action-btn" aria-label="Open ${escAttr(s.name)}">${SVG_OPEN}</a>` : '') +
-              `<button type="button" class="wizard-skills-list__action-btn wizard-skills-list__action-btn--disable" aria-label="${disabled ? 'Enable' : 'Disable'} ${escAttr(s.name)}" aria-pressed="${disabled}" onclick="bwToggleSkill('${escAttr(s.name)}')">${SVG_BAN}</button>` +
-            `</div>` +
-          `</div>` +
-        `</li>`
-      );
-    }).join('');
+    const rows = allRows.map(s => skillRowHtml(s, state.skills.disabled.has(s.name))).join('');
 
     const active = activeSkillsList().length;
 
@@ -242,23 +249,45 @@
   }
 
   window.bwToggleSkill = function(name) {
-    if (state.skills.disabled.has(name)) state.skills.disabled.delete(name);
+    const wasDisabled = state.skills.disabled.has(name);
+    if (wasDisabled) state.skills.disabled.delete(name);
     else state.skills.disabled.add(name);
-    renderSkills();
+    const nowDisabled = !wasDisabled;
+
+    // Surgical update — toggle the affected row in place, no full re-render
+    const li = document.querySelector('.wizard-skills-list__item[data-skill-name="' + CSS.escape(name) + '"]');
+    if (li) {
+      li.classList.toggle('wizard-skills-list__item--disabled', nowDisabled);
+      const btn = li.querySelector('.wizard-skills-list__action-btn--disable');
+      if (btn) {
+        btn.setAttribute('aria-pressed', String(nowDisabled));
+        btn.setAttribute('aria-label', (nowDisabled ? 'Enable ' : 'Disable ') + name);
+      }
+    }
+    updateActiveBadge();
   };
 
   window.bwHandleSkillUpload = function(ev) {
     const files = Array.from(ev.target.files || []);
     if (!files.length) return;
     let pending = files.length;
+    const added = [];
     files.forEach(file => {
       const reader = new FileReader();
       reader.onload = e => {
-        // de-dupe by name
         if (!state.skills.custom.some(s => s.name === file.name)) {
-          state.skills.custom.push({ name: file.name, content: e.target.result, isCustom: true });
+          const skill = { name: file.name, content: e.target.result, isCustom: true };
+          state.skills.custom.push(skill);
+          added.push(skill);
         }
-        if (--pending === 0) renderSkills();
+        if (--pending === 0) {
+          // Surgical append — insert just the new rows, no full re-render
+          const list = document.querySelector('.wizard-skills-list');
+          if (list) {
+            added.forEach(s => list.insertAdjacentHTML('beforeend', skillRowHtml(s, false)));
+          }
+          updateActiveBadge();
+        }
       };
       reader.readAsText(file);
     });
@@ -271,27 +300,7 @@
     state.brief.status = 'loading';
     state.brief.text = '';
     renderBriefLoading();
-
-    const p = state.proposal;
-    const skills = activeSkillsList().map(s => s.name);
-    const customContent = state.skills.custom
-      .filter(s => !state.skills.disabled.has(s.name))
-      .map(s => `--- custom skill: ${s.name} ---\n${s.content}`)
-      .join('\n\n');
-    const lines = [
-      'Generate a blog brief using the Stream-MCP `generate_content_brief` tool with `mode: "blog"`.',
-      '',
-      `Main Objective: ${p.mainObjective}`,
-    ];
-    if (p.focusPoints)     lines.push(`Focus Points: ${p.focusPoints}`);
-    if (p.category)        lines.push(`Blog Category: ${p.category}`);
-    if (p.articleProposal) lines.push(`Article Proposal: ${p.articleProposal}`);
-    lines.push('');
-    lines.push(`Active skills (${skills.length}): ${skills.join(', ')}`);
-    if (customContent) lines.push('', customContent);
-    lines.push('', 'When the brief is ready, call `window.populateBlogBrief(<markdown string>)` so the widget can transition from loading to the editable Brief Review.');
-
-    sendPrompt(lines.join('\n'));
+    sendPrompt('Generate the blog brief now.');
   };
 
   function renderBriefLoading() {
@@ -349,39 +358,24 @@
   window.bwRegenerateBrief = function() {
     const instructions = (document.getElementById('bw-regen-input').value || '').trim();
     if (!instructions) return;
-    // capture current brief edits before regenerating
-    state.brief.text = (document.getElementById('bw-brief').value || '').trim();
-    const previous = state.brief.text;
     state.brief.status = 'loading';
     state.brief.text = '';
     renderBriefLoading();
-    sendPrompt(
-      'Please regenerate the blog brief using Stream-MCP `generate_content_brief` with `mode: "blog"`.\n' +
-      'Apply the following revision instructions and improve on the current draft:\n\n' +
-      `--- revision instructions ---\n${instructions}\n\n` +
-      `--- current brief ---\n${previous}\n\n` +
-      'When ready, call `window.populateBlogBrief(<new markdown string>)`.'
-    );
+    sendPrompt('Regenerate the blog brief with these revisions:\n\n' + instructions);
   };
 
   // ----- Step 4: Page Creation -----
   window.bwCreatePage = function() {
-    // collect any edits to the brief before kicking off generation
+    // capture any in-form edits so they aren't lost when the form unmounts
     const briefEl = document.getElementById('bw-brief');
     if (briefEl) state.brief.text = (briefEl.value || '').trim();
 
     currentStep = 3;
     state.page = { items: [], url: '', status: 'streaming' };
     renderPageStreaming();
-
-    const skills = activeSkillsList().map(s => s.name);
-    sendPrompt(
-      'Please create the blog page using Stream-MCP `create_page_from_brief` with `mode: "blog"`.\n\n' +
-      `--- brief ---\n${state.brief.text}\n\n` +
-      `Active skills (${skills.length}): ${skills.join(', ')}\n\n` +
-      'As you generate each block, call `window.populateBlogStreamItem({ type: "TEXT" | "IMG", text: "…" })` so the widget can show a live feed.\n' +
-      'When the page is live, call `window.populateBlogPageComplete({ url: "<live page URL>" })`.'
-    );
+    // brief is included so any user edits to the textarea are carried into
+    // the next Claude turn (the prior data-state only has Claude's last version)
+    sendPrompt('Create the blog page from this brief:\n\n' + state.brief.text);
   };
 
   function feedItemHtml(item) {
@@ -451,7 +445,7 @@
   }
 
   window.bwProceedPreviewCollab = function() {
-    sendPrompt(`The blog page is live at ${state.page.url || '(no URL captured)'}. Please surface the preview and collaboration options for this page (e.g. preview link, share, request review, schedule publish).`);
+    sendPrompt('Show preview and collaboration options for this blog page.');
   };
 
   // ----- Navigation -----
