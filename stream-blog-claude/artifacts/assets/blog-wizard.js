@@ -532,6 +532,35 @@
     if (currentStep === 3) renderPageComplete();
   };
 
+  // ----- Hydration from baked state (primary data-delivery path) -----
+  // Claude re-renders the widget on each turn via show_widget, encoding the
+  // current state as JSON on `bw-root[data-state]`. We hydrate from it at
+  // boot, then dispatch into the right step in the right sub-state.
+  function hydrateFromBaked() {
+    const r = document.getElementById('bw-root');
+    if (!r || !r.dataset || !r.dataset.state) return false;
+    let baked;
+    try { baked = JSON.parse(r.dataset.state); } catch (_) { return false; }
+    if (!baked || typeof baked !== 'object') return false;
+
+    if (baked.proposal) Object.assign(state.proposal, baked.proposal);
+    if (baked.skills) {
+      if (Array.isArray(baked.skills.disabled)) state.skills.disabled = new Set(baked.skills.disabled);
+      if (Array.isArray(baked.skills.custom))   state.skills.custom = baked.skills.custom.map(s => Object.assign({}, s, { isCustom: true }));
+    }
+    if (baked.brief) Object.assign(state.brief, baked.brief);
+    if (baked.page) {
+      Object.assign(state.page, baked.page);
+      if (!Array.isArray(state.page.items)) state.page.items = [];
+    }
+    if (Number.isInteger(baked.currentStep)) currentStep = baked.currentStep;
+    return true;
+  }
+
   // ----- Boot -----
-  renderWelcome();
+  if (hydrateFromBaked() && currentStep >= 0) {
+    enterStep(currentStep);
+  } else {
+    renderWelcome();
+  }
 })();
