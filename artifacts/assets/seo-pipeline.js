@@ -6,7 +6,7 @@
     { key:'intake',  label:'Brief intake',       badge:'Step 1', badgeCls:'pp-badge-blue'   },
     { key:'brief',   label:'Brief generation',   badge:'Step 2', badgeCls:'pp-badge-purple' },
     { key:'content', label:'Content generation', badge:'Step 3', badgeCls:'pp-badge-teal'   },
-    { key:'page',    label:'Page generation',    badge:'Step 4', badgeCls:'pp-badge-amber'  },
+    { key:'page',    label:'Page creation',      badge:'Step 4', badgeCls:'pp-badge-amber'  },
   ];
 
   function setStepState(idx, st) {
@@ -65,7 +65,6 @@
     const aud = state.intake.aud  || '';
     const tn  = state.intake.tone || '';
     const ctx = state.intake.ctx  || '';
-    const nx  = state.intake.next || 'brief-only';
     setPanel(`
 <div class="pp-form-wrap">
   <div class="pp-section-bar">
@@ -116,15 +115,6 @@
     </div>
   </div>
 
-  <div class="pp-card pp-c-amber">
-    <div class="pp-card-label pp-lbl-amber"><i class="ti ti-route" aria-hidden="true"></i> After the brief</div>
-    <div class="pp-next-opts" id="f-next-opts">
-      <label class="pp-next-opt ${nx==='brief-only'?'sel':''}"><input type="radio" name="f-next" value="brief-only" ${nx==='brief-only'?'checked':''} /><div><div class="pp-opt-title">Brief only</div><div class="pp-opt-desc">Stop after the brief — review before proceeding</div></div></label>
-      <label class="pp-next-opt ${nx==='brief-page'?'sel':''}"><input type="radio" name="f-next" value="brief-page" ${nx==='brief-page'?'checked':''} /><div><div class="pp-opt-title">Brief → create page</div><div class="pp-opt-desc">Generate brief, then call <code>create_page_from_brief</code></div></div></label>
-      <label class="pp-next-opt ${nx==='brief-page-preflight'?'sel':''}"><input type="radio" name="f-next" value="brief-page-preflight" ${nx==='brief-page-preflight'?'checked':''} /><div><div class="pp-opt-title">Brief → page → preflight</div><div class="pp-opt-desc">Full pipeline including <code>generate_preflight_report</code></div></div></label>
-    </div>
-  </div>
-
   <div style="display:flex; align-items:center; gap:8px; margin-top:1rem;">
     <span class="pp-status" id="intake-status"><i class="ti ti-point-filled"></i> Ready</span>
     <div style="flex:1;"></div>
@@ -135,9 +125,6 @@
     document.querySelectorAll('.pp-chip').forEach(c => {
       c.addEventListener('click', () => { document.getElementById('f-kw').value = c.dataset.kw; document.getElementById('f-kw').focus(); });
     });
-    document.querySelectorAll('.pp-next-opt').forEach(opt => {
-      opt.addEventListener('click', () => { document.querySelectorAll('.pp-next-opt').forEach(o => o.classList.remove('sel')); opt.classList.add('sel'); });
-    });
   }
 
   window.submitIntake = function() {
@@ -147,7 +134,6 @@
       kw, aud: document.getElementById('f-aud').value.trim(),
       tone: document.getElementById('f-tone').value,
       ctx: document.getElementById('f-ctx').value.trim(),
-      next: document.querySelector('input[name=f-next]:checked').value,
     };
     const st = state.intake;
     showSummary(0, `<div class="pp-step-summary"><i class="ti ti-circle-check" aria-hidden="true"></i> <strong>${st.kw}</strong>${st.aud?' · '+st.aud:''} <span class="pp-step-edit-link" onclick="goBack(0)">edit</span></div>`);
@@ -160,9 +146,7 @@
     if (st.tone) lines.push(`Tone: ${st.tone}`);
     if (st.ctx)  lines.push(`Extra context: ${st.ctx}`);
     lines.push('');
-    if (st.next === 'brief-page') lines.push('After the brief, call `create_page_from_brief`.');
-    else if (st.next === 'brief-page-preflight') lines.push('After the brief, call `create_page_from_brief`, then `generate_preflight_report`.');
-    else lines.push('Stop after the brief — do not create a page yet.');
+    lines.push('Stop after the brief — do not create a page yet.');
 
     setPanel(`<div class="pp-form-wrap">
       <div class="pp-section-bar"><span class="pp-section-badge pp-badge-purple"><i class="ti ti-loader-2" style="font-size:11px; display:inline-block; animation:pp-spin 1s linear infinite;" aria-hidden="true"></i> Step 2 — Generating brief…</span></div>
@@ -218,7 +202,7 @@
   <div style="display:flex; align-items:center; gap:8px; margin-top:1rem; flex-wrap:wrap;">
     ${backBtn(0)}
     <button class="pp-btn" onclick="doRegenerate()"><i class="ti ti-refresh" aria-hidden="true"></i> Regenerate ↗</button>
-    <button class="pp-btn pp-btn-primary" onclick="proceedToContent()"><i class="ti ti-arrow-right" aria-hidden="true"></i> Proceed to content ↗</button>
+    <button class="pp-btn pp-btn-primary" onclick="proceedToContent()"><i class="ti ti-arrow-right" aria-hidden="true"></i> Generate content ↗</button>
   </div>
 </div>`);
 
