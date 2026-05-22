@@ -95,24 +95,33 @@ losing data:
 
 ### Reading state from prior widget renders
 
-The widget's `sendPrompt` payloads are intentionally
-**short** — typically one sentence — because the full
-state object is already serialized as JSON in the
+After the *first* MCP call (Generate Brief) the widget's
+`sendPrompt` payloads are intentionally **short** because
+the full state object is serialized as JSON in the
 `data-state` attribute on `#bw-root` in the most recent
-`show_widget` render in this conversation.
+`show_widget` render.
 
-**On every trigger, locate the most recent prior
-`show_widget` tool invocation in your conversation
-context, extract the JSON from `<div id="bw-root"
-data-state='…'>`, parse it, and treat it as the source of
-truth for** `proposal`, `skills`, `brief`, and `page`.
+**On every trigger except the first Generate-Brief
+trigger, locate the most recent prior `show_widget` tool
+invocation in your conversation context, extract the JSON
+from `<div id="bw-root" data-state='…'>`, parse it, and
+treat it as the source of truth for** `proposal`,
+`skills`, `brief`, and `page`.
+
+The **first Generate-Brief trigger is the exception**:
+the user has just typed proposal fields in the welcome →
+Step 1 → Step 2 path, all of which is client-side, so no
+prior widget render has `data-state` yet. That trigger
+therefore carries the proposal and active-skill list
+inline in its message body (see the trigger map below).
+Parse it from the message text.
 
 The triggers the widget will send (verbatim) and the
 expected action:
 
 | Trigger received via `sendPrompt` | Your action |
 |---|---|
-| `Generate the blog brief now.` | Read `proposal` + active skills (`SKILLS list ∖ skills.disabled`, plus `skills.custom`) from prior `data-state`. Call Stream-MCP `generate_blog_brief({ ...proposal, skills })`. Re-render with `currentStep: 2, brief: { text: <markdown>, status: "ready" }`; carry forward `proposal` and `skills`. |
+| `Generate the blog brief now.\n\nMain Objective: …\nFocus Points: …\nBlog Category: …\nArticle Proposal: …\n\nActive skills (N): name1.md, name2.md, …\n\nCustom uploaded skills:\n--- name.md ---\n<file body>` | This is the **first** Claude turn after the welcome view — there is **no prior `data-state`** with the proposal yet, so the proposal fields and active-skill list are embedded directly in this trigger. Parse them from the trigger text. Call Stream-MCP `generate_blog_brief({ ...proposal, skills })`. Re-render with `currentStep: 2, brief: { text: <markdown>, status: "ready" }` plus the parsed `proposal` and `skills` so subsequent triggers can read them from `data-state`. |
 | `Regenerate the blog brief with these revisions:\n\n<instructions>` | Read prior state from `data-state`. Apply `<instructions>` to the previous `brief.text` and call `generate_blog_brief({ ... })` again. Re-render at `currentStep: 2` with the new brief text. |
 | `Create the blog page from this brief:\n\n<brief markdown>` | The brief in this message is the user's possibly-edited version — **use it as the authoritative brief**, not the one in `data-state` (which only has Claude's previous version). Read active skills from prior `data-state`. Call Stream-MCP `create_blog_from_brief({ brief: <message brief>, skills })`. The response must include both `url` (live page) and `app_url` (preview & collab app). Re-render with `currentStep: 3, brief.text: <message brief>, page: { items, url, app_url, status: "complete" }`. |
 | `Please share the preview & collaboration app URL for this blog page.` | Fallback trigger sent only if the widget couldn't find `app_url` in the prior state (i.e. it was missing from the previous `create_blog_from_brief` response). Re-render with the `page.app_url` populated. |
@@ -150,21 +159,25 @@ plus any custom `.md` uploads. The user may disable any
 active-count badge updates locally.
 
 On **Next - Generate Brief** the widget transitions Step 3
-to its loading state and calls
-`sendPrompt('Generate the blog brief now.')` — that's it.
-You must:
+to its loading state and sends a multi-line `sendPrompt`
+that **embeds the proposal and active-skill list inline**
+because steps 1 and 2 are client-side and have produced
+no prior `data-state` for you to read from. You must:
 
-1. Read `proposal`, `skills.disabled`, and `skills.custom`
-   from the most recent prior `data-state` in conversation
-   context.
-2. Call Stream-MCP `generate_blog_brief` with the
-   proposal fields and the active skills (the full
-   hardcoded skill list minus anything in `disabled`,
-   plus the contents of any uploaded `custom` skills).
+1. Parse the proposal fields (Main Objective, Focus
+   Points, Blog Category, Article Proposal) and the
+   active-skills list directly from the trigger message.
+   Any "Custom uploaded skills" section in the trigger
+   contains the full file body for each user-uploaded
+   `.md` — include those in the call.
+2. Call Stream-MCP `generate_blog_brief` with the parsed
+   proposal fields and the active-skills set.
 3. When the brief is ready, **re-render the widget** via
    `show_widget` with `data-state` set so that
    `currentStep: 2`, `brief.text: <markdown>`,
-   `brief.status: "ready"`, and all prior state preserved.
+   `brief.status: "ready"`, and `proposal` + `skills`
+   carried forward (so the *next* trigger — Regenerate or
+   Create Page — can read them from `data-state`).
 
 ### Step 3 — Brief Generation
 - **Loading state**: shown the moment the user clicks Next

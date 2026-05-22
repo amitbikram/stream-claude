@@ -300,7 +300,30 @@
     state.brief.status = 'loading';
     state.brief.text = '';
     renderBriefLoading();
-    sendPrompt('Generate the blog brief now.');
+
+    // The proposal + skills live only in the widget's IIFE closure at this
+    // point. There is no prior `data-state`-baked widget render to read from
+    // (steps 1 & 2 are client-side, no Claude turn). So we must include them
+    // inline in the trigger — they can't be inferred from chat history.
+    const p = state.proposal;
+    const active = activeSkillsList();
+    const activeNames = active.map(s => s.name);
+    const customWithContent = active.filter(s => s.isCustom && s.content);
+
+    const lines = ['Generate the blog brief now.', ''];
+    lines.push(`Main Objective: ${p.mainObjective}`);
+    if (p.focusPoints)     lines.push(`Focus Points: ${p.focusPoints}`);
+    if (p.category)        lines.push(`Blog Category: ${p.category}`);
+    if (p.articleProposal) lines.push(`Article Proposal: ${p.articleProposal}`);
+    lines.push('', `Active skills (${activeNames.length}): ${activeNames.join(', ')}`);
+    if (customWithContent.length) {
+      lines.push('', 'Custom uploaded skills:');
+      customWithContent.forEach(s => {
+        lines.push('', `--- ${s.name} ---`, s.content);
+      });
+    }
+
+    sendPrompt(lines.join('\n'));
   };
 
   function renderBriefLoading() {
