@@ -85,21 +85,37 @@ losing data:
     "status": "idle"           // "idle" | "loading" | "ready"
   },
   "page": {
-    "items":  [],              // [{ "type": "TEXT"|"IMG", "text": "..." }]
-    "url":    "",              // final live page URL
-    "status": "idle"           // "idle" | "streaming" | "complete"
+    "items":   [],             // [{ "type": "TEXT"|"IMG", "text": "..." }]
+    "url":     "",             // final live page URL (the published blog)
+    "app_url": "",             // preview & collaboration app URL (used by the "Proceed to Preview & Collab" button)
+    "status":  "idle"          // "idle" | "streaming" | "complete"
   }
 }
 ```
 
-### Render triggers per transition
+### Reading state from prior widget renders
 
-| Trigger | Set `currentStep` | Required state slots |
-|---|---|---|
-| After `generate_content_brief` returns | `2` | `brief: { text: <markdown>, status: "ready" }`; carry forward `proposal` and `skills`. |
-| User clicked **Regenerate brief** (sendPrompt arrived with revision instructions + previous brief) | `2` | Same as above with the new brief text. |
-| After `create_page_from_brief` finishes | `3` | `page: { items: [<all generated blocks>], url: "<live URL>", status: "complete" }`; carry forward everything else. |
-| Streaming intermediate updates (optional) | `3` | `page: { items: [<partial>], url: "", status: "streaming" }` on each interim render. Only do this if the cost of multiple `show_widget` calls is acceptable; otherwise jump straight to `complete`. |
+The widget's `sendPrompt` payloads are intentionally
+**short** — typically one sentence — because the full
+state object is already serialized as JSON in the
+`data-state` attribute on `#bw-root` in the most recent
+`show_widget` render in this conversation.
+
+**On every trigger, locate the most recent prior
+`show_widget` tool invocation in your conversation
+context, extract the JSON from `<div id="bw-root"
+data-state='…'>`, parse it, and treat it as the source of
+truth for** `proposal`, `skills`, `brief`, and `page`.
+
+The triggers the widget will send (verbatim) and the
+expected action:
+
+| Trigger received via `sendPrompt` | Your action |
+|---|---|
+| `Generate the blog brief now.` | Read `proposal` + active skills (`SKILLS list ∖ skills.disabled`, plus `skills.custom`) from prior `data-state`. Call Stream-MCP `generate_blog_brief({ ...proposal, skills })`. Re-render with `currentStep: 2, brief: { text: <markdown>, status: "ready" }`; carry forward `proposal` and `skills`. |
+| `Regenerate the blog brief with these revisions:\n\n<instructions>` | Read prior state from `data-state`. Apply `<instructions>` to the previous `brief.text` and call `generate_blog_brief({ ... })` again. Re-render at `currentStep: 2` with the new brief text. |
+| `Create the blog page from this brief:\n\n<brief markdown>` | The brief in this message is the user's possibly-edited version — **use it as the authoritative brief**, not the one in `data-state` (which only has Claude's previous version). Read active skills from prior `data-state`. Call Stream-MCP `create_blog_from_brief({ brief: <message brief>, skills })`. The response must include both `url` (live page) and `app_url` (preview & collab app). Re-render with `currentStep: 3, brief.text: <message brief>, page: { items, url, app_url, status: "complete" }`. |
+| `Please share the preview & collaboration app URL for this blog page.` | Fallback trigger sent only if the widget couldn't find `app_url` in the prior state (i.e. it was missing from the previous `create_blog_from_brief` response). Re-render with the `page.app_url` populated. |
 
 The widget itself drives Steps 1 and 2 locally (no MCP
 calls there). You only need to re-render after the user
@@ -134,15 +150,18 @@ plus any custom `.md` uploads. The user may disable any
 active-count badge updates locally.
 
 On **Next - Generate Brief** the widget transitions Step 3
-to its loading state and calls `sendPrompt` with the
-proposal + active skills. You must:
+to its loading state and calls
+`sendPrompt('Generate the blog brief now.')` — that's it.
+You must:
 
-1. Call Stream-MCP `generate_content_brief` with
-   `mode: 'blog'`, the proposal fields, and the active
-   skills (the list passed in the prompt minus anything
-   in `disabled`; include the contents of any uploaded
-   custom skills).
-2. When the brief is ready, **re-render the widget** via
+1. Read `proposal`, `skills.disabled`, and `skills.custom`
+   from the most recent prior `data-state` in conversation
+   context.
+2. Call Stream-MCP `generate_blog_brief` with the
+   proposal fields and the active skills (the full
+   hardcoded skill list minus anything in `disabled`,
+   plus the contents of any uploaded `custom` skills).
+3. When the brief is ready, **re-render the widget** via
    `show_widget` with `data-state` set so that
    `currentStep: 2`, `brief.text: <markdown>`,
    `brief.status: "ready"`, and all prior state preserved.
@@ -155,33 +174,49 @@ proposal + active skills. You must:
   brief plus a regenerate section (instructions textarea +
   Regenerate brief button).
 
-If the user clicks **Regenerate brief**, the widget calls
-`sendPrompt` with the current brief and the revision
-instructions; call `generate_content_brief` again (with
-the revision applied) and re-render with the new brief.
+If the user clicks **Regenerate brief**, the widget sends
+`Regenerate the blog brief with these revisions:\n\n<instructions>`.
+Read prior state from `data-state`, apply the revision
+instructions to the previous `brief.text`, call
+`generate_blog_brief` again, and re-render with the
+new brief.
 
 On **Next - Create Page**, the widget transitions Step 4
-to its streaming state and calls `sendPrompt`. **Do not
-call `create_page_from_brief` until the user clicks Next
-on Step 3.**
+to its streaming state and sends
+`Create the blog page from this brief:\n\n<brief>`. The
+brief in that message is the authoritative current brief
+(it may include user edits not present in `data-state`).
+**Do not call `create_blog_from_brief` until the user
+clicks Next on Step 3.**
 
 ### Step 4 — Page Creation
 On entry, the widget shows a streaming feed. You must:
 
-1. Call Stream-MCP `create_page_from_brief` with
-   `mode: 'blog'`, the approved brief, and the active
-   skills list.
-2. Re-render the widget at completion with `currentStep: 3`,
+1. Use the brief from the trigger message (not the one in
+   `data-state` — that's stale). Read active skills from
+   prior `data-state`. Call Stream-MCP
+   `create_blog_from_brief` with the brief from the
+   trigger and the active skills list.
+2. The `create_blog_from_brief` response **must include
+   `app_url`** (the preview & collaboration app URL)
+   alongside `url` (the live published page). Re-render
+   the widget at completion with `currentStep: 3`,
+   `brief.text: <the brief you just used>`,
    `page.items: [<all generated blocks>]`,
-   `page.url: "<final live URL>"`, `page.status: "complete"`.
+   `page.url: "<final live URL>"`,
+   `page.app_url: "<preview & collab URL>"`,
+   `page.status: "complete"`.
    (Optionally, re-render mid-flight with partial items if
    you want a visible streaming feed — but the simpler
    path is one render at the end.)
 
-If the user clicks **Proceed to Preview & Collab**, the
-widget sends an open-ended prompt asking for preview /
-share / review options. Surface whatever next-step flow
-makes sense for the project.
+The **Proceed to Preview & Collab** button opens
+`page.app_url` directly in a new tab — no Claude turn
+involved. The button only triggers a `sendPrompt` (and
+hence a Claude turn) as a fallback when `app_url` is
+missing from prior state. Always populate `app_url` in
+the `create_blog_from_brief` response so users never hit
+the fallback path.
 
 ## Navigation
 The user can go back to any completed step at any time by
@@ -198,8 +233,8 @@ The **Reset** button zeroes all state and returns to Step
 1 with empty fields.
 
 ## Tool routing
-- generate_content_brief      → Stream-MCP  (use `mode: 'blog'`)
-- create_page_from_brief      → Stream-MCP  (use `mode: 'blog'`)
+- generate_blog_brief         → Stream-MCP
+- create_blog_from_brief      → Stream-MCP
 
 This project does **not** integrate with AEM DA Prod MCP.
 Stream-MCP is the sole tool surface for the blog wizard.
@@ -217,12 +252,29 @@ Stream-MCP is the sole tool surface for the blog wizard.
 - **Never advance `currentStep` past the user's actual
   progress.** Only set it to the step the user is
   currently meant to see.
-- **Never call `create_page_from_brief` automatically.**
+- **Never call `create_blog_from_brief` automatically.**
   Wait for the user to click Next on Step 3.
-- **Never call `generate_content_brief` automatically on
+- **Never call `generate_blog_brief` automatically on
   initial render.** Wait for the user to click Next on
   Step 2.
 - If the user navigates back and edits an earlier step,
   the next `sendPrompt` from the widget carries the
   updated inputs — re-run the relevant Stream-MCP tool
   with those updated values.
+- **Trigger sentences are intentionally minimal.** Don't
+  echo them back, don't ask the user to confirm — just
+  read prior state from `data-state` and act.
+
+## Known limitations
+
+Each `show_widget` call mounts a **new** widget instance
+in the chat — there is currently no in-place update path
+in this host. Users will see the previous widget instance
+remain above the new one in chat history whenever a step
+transition crosses an MCP boundary (Step 2 → 3 and Step
+3 → 4). This is dictated by the host's `show_widget`
+semantics and cannot be fixed from Claude or widget code
+alone. If a future host adds an in-place update API
+(e.g. `updateWidget(...)`, `postMessage`-based hydration),
+the widget's `populate*` hooks are already in place to
+consume it.

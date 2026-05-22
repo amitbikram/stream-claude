@@ -23,7 +23,7 @@
     proposal: { mainObjective: '', focusPoints: '', category: 'thought leadership', articleProposal: '' },
     skills:   { disabled: new Set(), custom: [] },
     brief:    { text: '', status: 'idle' },   // idle | loading | ready
-    page:     { items: [], url: '', status: 'idle' },  // idle | streaming | complete
+    page:     { items: [], url: '', app_url: '', status: 'idle' },  // idle | streaming | complete
   };
   let currentStep = -1; // -1 = welcome; 0..3 = wizard steps
 
@@ -445,7 +445,14 @@
   }
 
   window.bwProceedPreviewCollab = function() {
-    sendPrompt('Show preview and collaboration options for this blog page.');
+    const url = (state.page && state.page.app_url) || '';
+    if (!url) {
+      sendPrompt('Please share the preview & collaboration app URL for this blog page.');
+      return;
+    }
+    // Prefer host-provided openLink (sandbox-aware); fall back to window.open
+    if (typeof openLink === 'function') openLink(url);
+    else window.open(url, '_blank', 'noopener,noreferrer');
   };
 
   // ----- Navigation -----
