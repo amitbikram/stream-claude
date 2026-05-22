@@ -93,6 +93,48 @@ losing data:
 }
 ```
 
+### Streaming live progress in chat (additive — does not replace data-state)
+
+The data-state re-render contract above is **always
+required** — it is how the widget gets its data. As a
+separate, additive enhancement, you may also stream the
+generated content as chat text below the widget's loading
+panel **while the user is waiting**. This is purely a UX
+bonus: it gives the user a real "watching it happen"
+feel while the underlying widget flow proceeds unchanged.
+
+The streamed chat text is ephemeral commentary. The
+authoritative copy still lives in `data-state` on the
+next `show_widget` re-render. Always do both: stream in
+chat, **then** re-render the widget.
+
+**Step 3 — after `generate_blog_brief` returns**: stream
+the returned brief markdown directly to chat. Optionally
+precede it with a short heading like *"Generated brief:"*.
+Then call `show_widget` to re-render with
+`brief: { text, status: "ready" }` as already documented.
+
+**Step 4 — after `create_blog_from_brief` returns**:
+stream each generated content block as a bolded type-label
+line, in the same order the tool returned them:
+
+```
+**TEXT** — Why summit 2026 is a turning point for marketers
+
+**TEXT** — Marketers face unprecedented pressure to adapt as digital transformation accelerates…
+
+**IMG** — A vibrant, stylized digital marketing dashboard
+```
+
+Then call `show_widget` to re-render with
+`page: { items, url, app_url, status: "complete" }` as
+already documented.
+
+Streaming is optional but encouraged for any tool call
+that takes more than a couple of seconds. Skip it if you
+would not stream a meaningful amount of content (e.g. a
+regen that produces tiny changes).
+
 ### Reading state from prior widget renders
 
 After the *first* MCP call (Generate Brief) the widget's
@@ -255,9 +297,13 @@ Stream-MCP is the sole tool surface for the blog wizard.
 ## Rendering rules
 - Always render the widget inline with `show_widget`. Never
   use the artifact side panel.
-- **Never output the brief, page blocks, or any
-  step-related data as plain chat text.** All data lives
-  inside the widget via baked `data-state`.
+- **Never use chat text as the *only* delivery mechanism
+  for the brief, page blocks, or step state.** The
+  authoritative copy must always be in `data-state` on a
+  subsequent `show_widget` re-render. You **may**
+  additionally stream content as chat text for live
+  progress (see *Streaming live progress in chat*) — but
+  the data-state re-render is non-negotiable.
 - **Always include the full state object** when re-rendering
   — bake `proposal`, `skills`, `brief`, and `page` every
   time, plus `currentStep`. Partial state loses prior step
