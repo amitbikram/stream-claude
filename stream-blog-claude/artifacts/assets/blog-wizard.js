@@ -34,8 +34,8 @@
   // ----- SVG icons -----
   const SVG_CHEVRON_LEFT = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   const SVG_OPEN = '<svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M7 1h4v4M11 1L5.5 6.5M5 2H2a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1V8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-  // Feather "ban"/"slash" icon — stroke-based so it renders reliably at small sizes
-  const SVG_BAN = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><line x1="5.6" y1="5.6" x2="18.4" y2="18.4"/></svg>';
+  // Simple X icon — two crossed lines, the most reliable SVG shape in iframe sandboxes
+  const SVG_BAN = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>';
   const SVG_UPLOAD = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 16V8M12 8L9 11M12 8L15 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 20H17C18.1 20 19 19.1 19 18V14M5 14V18C5 19.1 5.9 20 7 20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   const SVG_EXT = '<svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M18 15.75V12.0308C18 11.6167 17.6641 11.2808 17.25 11.2808C16.8359 11.2808 16.5 11.6167 16.5 12.0308V15.75C16.5 16.1636 16.1636 16.5 15.75 16.5H4.25C3.83643 16.5 3.5 16.1636 3.5 15.75V4.25C3.5 3.83643 3.83643 3.5 4.25 3.5H8.06104C8.4751 3.5 8.81104 3.16406 8.81104 2.75C8.81104 2.33594 8.4751 2 8.06104 2H4.25C3.00928 2 2 3.00928 2 4.25V15.75C2 16.9907 3.00928 18 4.25 18H15.75C16.9907 18 18 16.9907 18 15.75Z" fill="currentColor"/><path d="M19 1.75V5.99268C19 6.40674 18.6641 6.74268 18.25 6.74268C17.8359 6.74268 17.5 6.40674 17.5 5.99268V3.56055L11.0303 10.0303C10.8838 10.1768 10.6919 10.25 10.5 10.25C10.3081 10.25 10.1162 10.1768 9.96973 10.0303C9.67676 9.73731 9.67676 9.2627 9.96973 8.96973L16.4395 2.5H14.0073C13.5933 2.5 13.2573 2.16406 13.2573 1.75C13.2573 1.33594 13.5933 1 14.0073 1H18.25C18.6641 1 19 1.33594 19 1.75Z" fill="currentColor"/></svg>';
   const SVG_SUCCESS = '<svg class="page-gen__success-svg" width="40" height="40" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 18.75C5.17529 18.75 1.25 14.8252 1.25 10C1.25 5.1748 5.17529 1.25 10 1.25C14.8247 1.25 18.75 5.1748 18.75 10C18.75 14.8252 14.8247 18.75 10 18.75ZM10 2.75C6.00244 2.75 2.75 6.00195 2.75 10C2.75 13.998 6.00244 17.25 10 17.25C13.9976 17.25 17.25 13.998 17.25 10C17.25 6.00195 13.9976 2.75 10 2.75Z" fill="#079355"/><path class="page-gen__svg-check" d="M9.18263 13.9434C8.97072 13.9434 8.76759 13.8535 8.62501 13.6953L5.98146 10.7559C5.7046 10.4473 5.72951 9.97363 6.03761 9.69629C6.34571 9.41895 6.82032 9.44531 7.09669 9.75195L9.12355 12.0059L12.8228 6.95996C13.0674 6.62598 13.5381 6.55273 13.8711 6.79883C14.2051 7.04297 14.2774 7.5127 14.0327 7.84668L9.78761 13.6367C9.65382 13.8193 9.44532 13.9316 9.22023 13.9424C9.20753 13.9434 9.19484 13.9434 9.18263 13.9434Z" fill="#079355"/></svg>';
@@ -47,9 +47,12 @@
   // ----- Wizard bar -----
   function wizardBarHtml() {
     const parts = [];
+    // Treat the page step as "done" once the page is created (URL is live),
+    // so the wizard bar shows all 4 checkmarks on the final success state.
+    const finalDone = currentStep === 3 && state.page && state.page.status === 'complete';
     for (let i = 0; i < 4; i++) {
-      const isDone   = i < currentStep;
-      const isActive = i === currentStep;
+      const isDone   = i < currentStep || (finalDone && i === 3);
+      const isActive = i === currentStep && !(finalDone && i === 3);
       const cls = 'wizard-bar__step' + (isActive ? ' wizard-bar__step--active' : isDone ? ' wizard-bar__step--done' : '');
       const circleAttrs = isDone ? ` onclick="bwGoBack(${i})" title="Go back to ${escAttr(STEP_LABELS[i])}"` : '';
       const labelAttrs  = isDone ? ` onclick="bwGoBack(${i})"` : '';
@@ -61,7 +64,8 @@
         `</div>`
       );
       if (i < 3) {
-        const connCls = 'wizard-bar__connector' + (i < currentStep ? ' wizard-bar__connector--done' : '');
+        const connDone = i < currentStep || finalDone;
+        const connCls = 'wizard-bar__connector' + (connDone ? ' wizard-bar__connector--done' : '');
         parts.push(`<div class="${connCls}"></div>`);
       }
     }

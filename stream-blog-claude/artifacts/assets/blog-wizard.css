@@ -193,10 +193,14 @@
 .wizard-skills-list__item {
   border-bottom: 0.5px solid var(--color-border-tertiary);
   background: var(--color-background-primary);
-  transition: opacity 0.15s;
 }
 .wizard-skills-list__item:last-child { border-bottom: none; }
-.wizard-skills-list__item--disabled { opacity: 0.45; }
+/* Disabled state: strikethrough the skill name + dim it slightly.
+   Action buttons stay fully visible so the user can re-enable. */
+.wizard-skills-list__item--disabled .wizard-skills-list__name-link {
+  text-decoration: line-through;
+  color: var(--color-text-tertiary);
+}
 .wizard-skills-list__row {
   display: flex; align-items: center;
   gap: 10px; padding: 9px 12px;
