@@ -27,6 +27,37 @@
   };
   let currentStep = -1; // -1 = welcome; 0..3 = wizard steps
 
+  // ----- Session-scoped persistence -----
+  // Each Claude re-render mounts a new widget instance; the IIFE closure is
+  // wiped. Claude's baked data-state usually carries proposal/disabled/brief
+  // but drops bulky custom-skill bodies. We snapshot to sessionStorage so
+  // navigating back never loses the user's selections or uploads. Storage is
+  // tab-scoped — closed tabs forget, no cross-conversation bleed.
+  const STORAGE_KEY = 'bwz-state-v1';
+
+  function saveSnapshot() {
+    try {
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify({
+        proposal: state.proposal,
+        skills:   { disabled: Array.from(state.skills.disabled), custom: state.skills.custom },
+        brief:    state.brief,
+        page:     state.page,
+        currentStep: currentStep,
+      }));
+    } catch (e) { /* quota or disabled storage — fail silent */ }
+  }
+
+  function loadSnapshot() {
+    try {
+      const raw = sessionStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) { return null; }
+  }
+
+  function clearSnapshot() {
+    try { sessionStorage.removeItem(STORAGE_KEY); } catch (e) {}
+  }
+
   // ----- HTML escape helpers -----
   function escAttr(s) { return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
   function escText(s) { return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
@@ -188,6 +219,7 @@
     if (!state.proposal.mainObjective) { document.getElementById('bw-objective').focus(); return; }
     currentStep = 1;
     renderSkills();
+    saveSnapshot();
   };
 
   // ----- Step 2: Skills Review -----
@@ -269,6 +301,7 @@
       }
     }
     updateActiveBadge();
+    saveSnapshot();
   };
 
   window.bwHandleSkillUpload = function(ev) {
@@ -291,6 +324,7 @@
             added.forEach(s => list.insertAdjacentHTML('beforeend', skillRowHtml(s, false)));
           }
           updateActiveBadge();
+          saveSnapshot();
         }
       };
       reader.readAsText(file);
@@ -328,6 +362,7 @@
     }
 
     sendPrompt(lines.join('\n'));
+    saveSnapshot();
   };
 
   function renderBriefLoading() {
@@ -389,6 +424,7 @@
     state.brief.text = '';
     renderBriefLoading();
     sendPrompt('Regenerate the blog brief with these revisions:\n\n' + instructions);
+    saveSnapshot();
   };
 
   // ----- Step 4: Page Creation -----
@@ -403,6 +439,7 @@
     // brief is included so any user edits to the textarea are carried into
     // the next Claude turn (the prior data-state only has Claude's last version)
     sendPrompt('Create the blog page from this brief:\n\n' + state.brief.text);
+    saveSnapshot();
   };
 
   function feedItemHtml(item) {
@@ -496,11 +533,12 @@
     }
   }
 
-  window.bwStart = function() { enterStep(0); };
+  window.bwStart = function() { enterStep(0); saveSnapshot(); };
 
   window.bwGoBack = function(idx) {
     if (idx === 0) { collectStepFormsIfPresent(); }
     enterStep(idx);
+    saveSnapshot();
   };
 
   function collectStepFormsIfPresent() {
@@ -512,14 +550,17 @@
   window.bwClose = function() {
     collectStepFormsIfPresent();
     renderWelcome();
+    saveSnapshot();
   };
 
   window.bwReset = function() {
     state.proposal = { mainObjective: '', focusPoints: '', category: 'thought leadership', articleProposal: '' };
     state.skills   = { disabled: new Set(), custom: [] };
     state.brief    = { text: '', status: 'idle' };
-    state.page     = { items: [], url: '', status: 'idle' };
+    state.page     = { items: [], url: '', app_url: '', status: 'idle' };
+    clearSnapshot();
     enterStep(0);
+    saveSnapshot();
   };
 
   // ----- Populate hooks (called by Claude/host when MCP tools return) -----
@@ -527,6 +568,7 @@
     state.brief.text = String(text == null ? '' : text);
     state.brief.status = 'ready';
     if (currentStep === 2) renderBriefReview();
+    saveSnapshot();
   };
 
   window.populateBlogStreamItem = function(item) {
@@ -545,6 +587,7 @@
         renderPageStreaming();
       }
     }
+    saveSnapshot();
   };
 
   window.populateBlogPageComplete = function(data) {
@@ -556,8 +599,10 @@
       }
     }
     state.page.url = data.url || '';
+    state.page.app_url = data.app_url || '';
     state.page.status = 'complete';
     if (currentStep === 3) renderPageComplete();
+    saveSnapshot();
   };
 
   // ----- Hydration from baked state (primary data-delivery path) -----
@@ -586,9 +631,38 @@
   }
 
   // ----- Boot -----
-  if (hydrateFromBaked() && currentStep >= 0) {
-    enterStep(currentStep);
-  } else {
-    renderWelcome();
+  // Two-layer hydration:
+  //   1. Baked data-state from Claude's last show_widget render (authoritative
+  //      for currentStep, brief, page, proposal, skills.disabled).
+  //   2. sessionStorage snapshot (backup for custom skill bodies + anything
+  //      Claude might have dropped from data-state).
+  const bakedOk = hydrateFromBaked();
+  const snap = loadSnapshot();
+  if (snap) {
+    if (bakedOk) {
+      // Baked wins — but custom skill bodies are large and Claude often drops
+      // them, so restore from snapshot if baked has no custom skills.
+      if (!Array.isArray(state.skills.custom) || state.skills.custom.length === 0) {
+        if (snap.skills && Array.isArray(snap.skills.custom)) {
+          state.skills.custom = snap.skills.custom.map(s => Object.assign({}, s, { isCustom: true }));
+        }
+      }
+    } else if (Number.isInteger(snap.currentStep) && snap.currentStep >= 0) {
+      // No baked state at all (fresh show_widget mount) — fully restore from snapshot
+      if (snap.proposal) Object.assign(state.proposal, snap.proposal);
+      if (snap.skills) {
+        if (Array.isArray(snap.skills.disabled)) state.skills.disabled = new Set(snap.skills.disabled);
+        if (Array.isArray(snap.skills.custom))   state.skills.custom   = snap.skills.custom.map(s => Object.assign({}, s, { isCustom: true }));
+      }
+      if (snap.brief) Object.assign(state.brief, snap.brief);
+      if (snap.page) {
+        Object.assign(state.page, snap.page);
+        if (!Array.isArray(state.page.items)) state.page.items = [];
+      }
+      currentStep = snap.currentStep;
+    }
   }
+
+  if (currentStep >= 0) enterStep(currentStep);
+  else renderWelcome();
 })();
