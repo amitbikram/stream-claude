@@ -21,7 +21,7 @@
 
   const state = {
     proposal: { mainObjective: '', focusPoints: '', category: 'thought leadership', articleProposal: '' },
-    skills:   { disabled: new Set(), custom: [] },
+    skills:   { disabled: new Set(['brand-marks.md', 'color.md', 'imagery.md', 'lockups.md', 'templates-events-gear.md', 'typography.md']), custom: [] },
     brief:    { text: '', status: 'idle' },   // idle | loading | ready
     page:     { items: [], url: '', app_url: '', status: 'idle' },  // idle | streaming | complete
   };
