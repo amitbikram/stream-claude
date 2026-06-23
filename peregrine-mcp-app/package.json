@@ -1,0 +1,27 @@
+{
+  "name": "peregrine-mcp-app",
+  "version": "0.2.0",
+  "description": "MCP-UI rebuild of the stream-blog-claude wizard. UI-only — relies on Stream-MCP/DOTCOM-MCP for content generation, orchestrated by the model.",
+  "type": "module",
+  "private": true,
+  "bin": {
+    "peregrine-mcp-app": "dist/server.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "dev": "tsc --watch"
+  },
+  "dependencies": {
+    "@mcp-ui/server": "^5.7.0",
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.5.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
