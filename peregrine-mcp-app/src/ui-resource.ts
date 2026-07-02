@@ -6,7 +6,7 @@ import type { WizardState } from './state.js';
 // query param. Both browsers and the MCP-UI iframe sandbox cache the assets
 // aggressively after first load, so subsequent renders are near-instant.
 const WIZARD_URL = process.env.PEREGRINE_WIZARD_URL
-  || 'https://cdn.jsdelivr.net/gh/amitbikram/stream-claude@bd7dfbf/peregrine-mcp-app/widget/blog_wizard.html';
+  || 'https://cdn.jsdelivr.net/gh/amitbikram/stream-claude@38ee19a/peregrine-mcp-app/widget/blog_wizard.html';
 
 // Build the iframe URL by URL-encoding the wizard state as the `state`
 // query param. The shell's inline boot script copies this into the
